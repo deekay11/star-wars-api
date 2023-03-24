@@ -1,24 +1,26 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-
+import "./App.css";
+import FetchData from "./Components/FetchData";
+import ResultDisplay from "./Components/ResultDisplay";
+import { StarWarsCharacter } from "./Components/StarWarsCharacter";
+import { ApiBase } from "./Components/ApiBase";
 function App() {
+  const { data, error, isFetching, status } = FetchData<{ name: string }>(
+    `${ApiBase}/people/1/`
+  );
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>
+        {isFetching ? (
+          "Fetching..."
+        ) : (
+          <>
+            <ResultDisplay data={data} status={status} error={error as Error | undefined} />
+
+            {data && <StarWarsCharacter name={data.name} />}
+          </>
+        )}
+      </h1>
     </div>
   );
 }

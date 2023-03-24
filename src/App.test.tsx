@@ -1,9 +1,26 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import { rest } from "msw";
+import { setupServer } from "msw/node";
+import { render, screen, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import App from "./App";
+import { ApiBase } from "./Components/ApiBase";
 
-test('renders learn react link', () => {
+const server = setupServer(
+  rest.get(`${ApiBase}/people/1/`, (req, res, ctx) => {
+    return res(
+      ctx.status(200),
+      ctx.json({
+        name: 'Luke Skywalker',
+      })
+    );
+  })
+);
+
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+
+test('renders the name of the first person from the Star Wars API', async () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  await waitFor(() => expect(screen.getByText(/Luke Skywalker/i)).toBeInTheDocument());
 });
